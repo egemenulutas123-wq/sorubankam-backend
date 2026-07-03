@@ -10,7 +10,8 @@ import socialRoutes from "./routes/social";
 import attemptsRoutes from "./routes/attempts";
 import badgesRoutes from "./routes/badges";
 import exploreRoutes from "./routes/explore";
-import uploadRoutes from "./routes/upload"; // Görsel Yükleme rotası eklendi
+import uploadRoutes from "./routes/upload";
+import profileRoutes from "./routes/profile"; 
 
 dotenv.config();
 
@@ -34,7 +35,8 @@ app.use("/api", socialRoutes);
 app.use("/api", attemptsRoutes);
 app.use("/api", badgesRoutes);
 app.use("/api/explore", exploreRoutes);
-app.use("/api", uploadRoutes); // Görsel rotası sisteme bağlandı
+app.use("/api", uploadRoutes); 
+app.use("/api", profileRoutes); 
 
 // Sunucuyu Başlat
 app.listen(port, () => {
