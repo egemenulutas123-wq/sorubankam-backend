@@ -15,6 +15,12 @@ model Profile {
   fullName       String?
   avatarUrl      String?     // YENİ EKLENDİ: Profil Fotoğrafı Linki
   
+  // ---> EKSİK OLAN VE YENİ EKLENEN PROFİL ALANLARI <---
+  bio            String?
+  grade          String?
+  city           String?
+  subjects       String?
+  
   xpCurrent      Int         @default(0)
   currentStreak  Int         @default(0)
   longestStreak  Int         @default(0)
@@ -104,19 +110,19 @@ model Badge {
   description      String
   xpReward         Int
   requirementType  String      
-  requirementValue Int         
+  requirementValue Int          
   
   users            UserBadge[]
 }
 
 model UserBadge {
-  id        String   @id @default(uuid())
-  userId    String
-  badgeId   String
-  earnedAt  DateTime @default(now())
+  id       String   @id @default(uuid())
+  userId   String
+  badgeId  String
+  earnedAt DateTime @default(now())
 
-  user      Profile  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  badge     Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+  user     Profile  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge    Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
 
   @@unique([userId, badgeId]) 
 }
