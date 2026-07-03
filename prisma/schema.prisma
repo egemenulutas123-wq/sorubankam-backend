@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Profile {
+  id             String      @id @default(uuid())
+  email          String      @unique
+  username       String      @unique
+  password       String
+  fullName       String?
+  avatarUrl      String?     // YENİ EKLENDİ: Profil Fotoğrafı Linki
+  
+  xpCurrent      Int         @default(0)
+  currentStreak  Int         @default(0)
+  longestStreak  Int         @default(0)
+  lastActiveDate DateTime?
+  
+  decks          Deck[]   
+  savedDecks     SavedDeck[]
+  followers      Follow[]    @relation("Following")
+  following      Follow[]    @relation("Followers")
+  attempts       Attempt[]
+  badges         UserBadge[]
+}
+
+model Deck {
+  id        String      @id @default(uuid())
+  title     String
+  category  String?
+  isPublic  Boolean     @default(false)
+  coverUrl  String?     // YENİ EKLENDİ: Deste Kapak Fotoğrafı Linki
+  authorId  String
+  createdAt DateTime    @default(now())
+  
+  author    Profile     @relation(fields: [authorId], references: [id])
+  questions Question[] 
+  savedBy   SavedDeck[] 
+}
+
+model Question {
+  id                 String    @id @default(uuid())
+  questionText       String
+  correctOptionIndex Int
+  deckId             String
+  createdAt          DateTime  @default(now())
+  
+  deck               Deck      @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  options            Option[]
+  attempts           Attempt[]
+}
+
+model Option {
+  id         String   @id @default(uuid())
+  text       String
+  questionId String
+  
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+model Follow {
+  id          String   @id @default(uuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+
+  follower    Profile  @relation("Followers", fields: [followerId], references: [id], onDelete: Cascade)
+  following   Profile  @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+}
+
+model SavedDeck {
+  id        String   @id @default(uuid())
+  userId    String
+  deckId    String
+  createdAt DateTime @default(now())
+
+  user      Profile  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deck      Deck     @relation(fields: [deckId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, deckId])
+}
+
+model Attempt {
+  id             String   @id @default(uuid())
+  userId         String
+  questionId     String
+  selectedOption String
+  isCorrect      Boolean
+  answeredAt     DateTime @default(now())
+
+  user           Profile  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question       Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+model Badge {
+  id               String      @id @default(uuid())
+  name             String
+  description      String
+  xpReward         Int
+  requirementType  String      
+  requirementValue Int         
+  
+  users            UserBadge[]
+}
+
+model UserBadge {
+  id        String   @id @default(uuid())
+  userId    String
+  badgeId   String
+  earnedAt  DateTime @default(now())
+
+  user      Profile  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge     Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId]) 
+}
