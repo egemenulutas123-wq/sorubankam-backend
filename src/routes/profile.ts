@@ -10,7 +10,16 @@ router.get("/profile", authMiddleware, async (req: any, res) => {
   try {
     const profile = await prisma.profile.findUnique({
       where: { id: req.userId },
-      // İstersen buraya istatistikleri de include edebilirsin (deck sayısı vb.)
+      // YENİ EKLENDİ: Takipçi, takip edilen ve deste sayılarını getiriyoruz
+      include: {
+        _count: {
+          select: {
+            followers: true,
+            following: true,
+            decks: true
+          }
+        }
+      }
     });
     
     if (!profile) {
@@ -26,11 +35,12 @@ router.get("/profile", authMiddleware, async (req: any, res) => {
 // 2. Profil bilgilerini güncelle
 router.put("/profile", authMiddleware, async (req: any, res) => {
   try {
-    const { fullName, bio, grade, city, subjects } = req.body;
+    // YENİ EKLENDİ: avatarUrl de eklendi ki profil fotosu güncellenirken çökmesin
+    const { fullName, bio, grade, city, subjects, avatarUrl } = req.body;
     
     const updatedProfile = await prisma.profile.update({
       where: { id: req.userId },
-      data: { fullName, bio, grade, city, subjects },
+      data: { fullName, bio, grade, city, subjects, avatarUrl },
     });
     
     res.json(updatedProfile);
@@ -52,7 +62,14 @@ router.get("/profile/:userId", async (req, res) => {
         bio: true,
         avatarUrl: true,
         xpCurrent: true,
-        // Gizli kalması gereken şifre, email gibi alanları burada seçmiyoruz
+        // YENİ EKLENDİ: Public profilde de takipçi sayılarını gösteriyoruz
+        _count: {
+          select: {
+            followers: true,
+            following: true,
+            decks: true
+          }
+        }
       }
     });
 
