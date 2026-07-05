@@ -35,12 +35,13 @@ router.get("/profile", authMiddleware, async (req: any, res) => {
 // 2. Profil bilgilerini güncelle
 router.put("/profile", authMiddleware, async (req: any, res) => {
   try {
-    // YENİ EKLENDİ: avatarUrl de eklendi ki profil fotosu güncellenirken çökmesin
-    const { fullName, bio, grade, city, subjects, avatarUrl } = req.body;
+    // DÜZELTME: Mobilden gelen 'username' ve 'visibility' eklendi. 
+    // Aksi takdirde kullanıcı adı ve görünürlük ayarları kaydedilmez.
+    const { fullName, username, bio, grade, city, subjects, avatarUrl, visibility } = req.body;
     
     const updatedProfile = await prisma.profile.update({
       where: { id: req.userId },
-      data: { fullName, bio, grade, city, subjects, avatarUrl },
+      data: { fullName, username, bio, grade, city, subjects, avatarUrl, visibility },
     });
     
     res.json(updatedProfile);

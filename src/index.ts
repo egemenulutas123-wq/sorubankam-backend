@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 
@@ -21,6 +21,17 @@ const port = process.env.PORT || 3000;
 // Middleware'ler
 app.use(cors());
 app.use(express.json());
+
+// 🚀 CANLI UYGULAMA İÇİN HAYAT KURTARAN YÖNLENDİRME (KÖPRÜ)
+// Canlıdaki mobil uygulama yanlışlıkla /api/auth/profile adresine istek attığı için
+// bu isteği sunucu içinde otomatik olarak doğru olan /api/profile rotasına çeviriyoruz.
+app.use((req: Request, res: Response, next: NextFunction) => {
+  // Eğer mobilden gelen istek tam olarak bu hatalı adres ise:
+  if (req.url === '/api/auth/profile') {
+    req.url = '/api/profile'; // Adresi doğru olanla değiştir ve yola devam et
+  }
+  next();
+});
 
 // Ana Sayfa Testi
 app.get("/", (req: Request, res: Response) => {

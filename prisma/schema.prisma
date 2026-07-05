@@ -20,6 +20,7 @@ model Profile {
   grade          String?
   city           String?
   subjects       String?
+  visibility     String?     // YENİ EKLENDİ: Görünürlük ayarı eksikti, eklendi.
   
   xpCurrent      Int         @default(0)
   currentStreak  Int         @default(0)
@@ -110,7 +111,7 @@ model Badge {
   description      String
   xpReward         Int
   requirementType  String      
-  requirementValue Int          
+  requirementValue Int         
   
   users            UserBadge[]
 }
